@@ -1,9 +1,7 @@
 const express = require('express');
-const axios = require('axios');
 const cors = require('cors');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
@@ -13,10 +11,10 @@ app.use(express.json());
 app.get('/', (req, res) => {
     res.json({
         status: 'success',
-        message: 'EcoVista API is running perfectly!',
+        message: 'EcoVista API is running perfectly on Vercel!',
         version: '2.0.0',
         timestamp: new Date().toISOString(),
-        server: 'Heroku'
+        server: 'Vercel'
     });
 });
 
@@ -24,9 +22,9 @@ app.get('/', (req, res) => {
 app.get('/health', (req, res) => {
     res.json({
         status: 'healthy',
-        uptime: process.uptime(),
-        memory: process.memoryUsage(),
-        timestamp: new Date().toISOString()
+        platform: 'Vercel',
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV || 'production'
     });
 });
 
@@ -59,6 +57,9 @@ app.post('/api/v1/generate-wallpaper', async (req, res) => {
         
         console.log('📝 Enhanced prompt:', enhancedPrompt);
         console.log('👤 User ID:', user_id);
+        
+        // Dynamic import for Vercel
+        const axios = (await import('axios')).default;
         
         // Call DumplingAI API
         const response = await axios.post('https://app.dumplingai.com/api/v1/generate-ai-image', {
@@ -150,9 +151,5 @@ app.use('*', (req, res) => {
     });
 });
 
-// Start server
-app.listen(PORT, () => {
-    console.log(`🚀 EcoVista API Server running on port ${PORT}`);
-    console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`🎨 Ready to generate beautiful nature wallpapers!`);
-});
+// Export for Vercel
+module.exports = app;
